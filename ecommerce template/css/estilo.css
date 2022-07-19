@@ -1,0 +1,8 @@
+.fotoProducto{
+    width: 268px;
+    height: 269px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+}
+
