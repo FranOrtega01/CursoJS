@@ -1,8 +1,12 @@
 
 const myCart = document.getElementById('cart'); //Número de elementos en el carrito mostrado en la página
 const listaProductos = []; //Array con los productos de mi tienda
-const carrito = []; //Array con los productos dentro del carrito
-let carritoPrice = 0; //Precio total del carrito
+
+const carrito = JSON.parse(localStorage.getItem('carrito')) ?? [];
+let carritoPrice = carrito.reduce((acumulador, producto) => acumulador + producto.price, 0);
+localStorage.setItem('CantidadDeProductos',carrito.length)
+const totalCarrito = localStorage.getItem('CantidadDeProductos');
+myCart.innerHTML = `${totalCarrito} - $${carritoPrice}`;
 
 
 //Función constructora de un producto
@@ -17,32 +21,37 @@ function Producto(id, name, price, img){
 function agregarProducto(id, name, price,img){
     listaProductos.push(new Producto(id, name, price, img));
 } 
-
 //Remover un producto de la lista
 function removerProductoList(id){
     let indexList = listaProductos.findIndex((producto) => producto.id === id);
     if(indexList !== -1) listaProductos.splice(indexList,1);
 }
 
+//Funciones Carrito------------------------------------------------------------------------------------
 //Agregar producto al carrito
 function cart(id){
     let objeto = listaProductos.find((el) => el.id === id); //Busca el elemento con esa id y lo agrega al carrito
     carrito.push(objeto);
+    localStorage.setItem('carrito', JSON.stringify(carrito))
     //Actualizar precio y numero del carrito
-    myCart.innerHTML = carrito.length;
-    carritoPrice += objeto.price;
-    console.log(`Total actual del carrito: $${carritoPrice}.00`)
-    console.log(carrito)
+    let carritoPrice = carrito.reduce((acumulador, producto) => acumulador + producto.price, 0)
+    console.log(carrito.length);
+    localStorage.setItem('CantidadDeProductos',carrito.length)
+    myCart.innerHTML = `${carrito.length} - $${carritoPrice}`;
 
 }
 
 //Remover producto del carrito
 function removerProductoCart(id){
     let indexCart = carrito.findIndex((producto) => producto.id === id); //Busca el index del id indicado
-    if (carrito.length > 0 && indexCart !== -1){
-        carritoPrice -= carrito[indexCart].price; //Resta el precio del objeto con el index buscado
+    if (totalCarrito > 0 && indexCart !== -1){
+        
         carrito.splice(indexCart,1); //Borra el elemento con la id indicada
-        myCart.innerHTML = carrito.length; //Actualiza el carrito
+        localStorage.setItem('carrito', JSON.stringify(carrito))
+        let carritoPrice = carrito.reduce((acumulador, producto) => acumulador + producto.price, 0)
+
+        myCart.innerHTML = `${carrito.length} - $${carritoPrice}`;
+        //Actualiza el carrito
         console.log(`Total actual del carrito: $${carritoPrice}.00`)
         console.log(carrito);
     }else if (carrito.length == 0){
@@ -50,8 +59,20 @@ function removerProductoCart(id){
     }else{
         console.log('El producto no esta en el carrito')
     }
-
+    localStorage.setItem('CantidadDeProductos',carrito.length)
 }
+//----------------------------------
+//Vaciar el carrito ✓
+const btnVaciarCarrito = document.getElementById('borrarCarrito');
+btnVaciarCarrito.addEventListener('click', () => {
+    carrito.splice(0,carrito.length); //Vacia el carrito
+    localStorage.setItem('carrito', JSON.stringify(carrito)) //Sube el carrito vacio al storage
+    carritoPrice = carrito.reduce((acumulador, producto) => acumulador + producto.price, 0) // Se actualiza el precio
+    console.log('Se vació el carrito!')
+    localStorage.setItem('CantidadDeProductos',carrito.length);
+    myCart.innerHTML = `${carrito.length} - $${carritoPrice}`;
+});
+//----------------------------------
 
 //Filtrar los productos por precio 
 function filtrarPrecio(arr, priceFilter){
@@ -100,33 +121,35 @@ listaProductos.forEach(item => {
 productosEnTienda.appendChild(fragment);
 //----------------------------------
 
+//Prueba STORAGE
 
-//Actualizar numero con carrito  x
-    //Pendiente, detectar cambio en el array carrito e imprimir su longitud en myCart.innerHTML
-//----------------------------------
-
-
-//Vaciar el carrito ✓
-const btnVaciarCarrito = document.getElementById('borrarCarrito');
-btnVaciarCarrito.addEventListener('click', () => {
-    carrito.splice(0,carrito.length);
-    myCart.innerHTML = carrito.length;
-    carritoPrice = 0;
-    console.log('Se vació el carrito!')
-});
-//----------------------------------
+// localStorage.setItem('carrito','Remera de bokita');
+//Se puede reemplazar el valor
+// console.log(localStorage.getItem('carrito'));
 
 
+//JSON
+/*
+(!) JSON.stringify(carrito) -> pasa el carrito a string para ponerlo en storage 
+
+quiero guardar el array del carrito en el storage y vincularlo al numero del carrito
+
+(!) const carrito = JSON.parse(localStorage.getItem('carrito'))  ->  lo trae y lo parse *1
+
+(!) Ahora uso el reduce para el numerito:
+const total = carrito.reduce((acumulador, producto) => acumulador + producto.price, 0);
+document.getElementById('cart').innerHTML = `${carrito.length}`
+
+Para la primera vez que entra:
+
+Hago una validacion *1
+
+const carrito = JSON.parse(localStorage.getItem('carrito')) ?? [] -> si existe el carrito se muestra ese, sino se muestra []
 
 
+--Como mostrar items del carrito
 
-
-
-
-
-
-
-
+*/
 
 
 
